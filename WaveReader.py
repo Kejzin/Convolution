@@ -6,41 +6,8 @@ import ntpath
 class WaveWriter:
     def __init__(self, ):
         """Write audio files which audio events."""
-        pass
-
-    def read_defined_frames(self, file_path, event):
-        """Read events from audio file
-        Params
-        ------
-            file_path: str
-                path to audio file which will be read
-            event: (float, float, float)
-                touple containing start, end and lenth of event
-        Returns
-        -------
-            frames_and_params: (b, ())
-                touple containing frames which event and params of file.
-        """
-        start, end, length = event
-        audio_file = wave.open(file_path, 'rb')
-        audio_file.rewind()
-        frame_rate = audio_file.getframerate()
-        start_position = audio_file.tell() + int(start * frame_rate)
-        audio_file.setpos(start_position)
-        frames_to_read = int(length * frame_rate)
-
-        print('Read frames from {} to {}'.format(start_position, start_position + frames_to_read))
-
-        frames = audio_file.readframes(frames_to_read)
-
-        print('Samples from {} to {} has been read.'.format(start_position, audio_file.tell()))
-        print('')
-
-        params = audio_file.getparams()
-        frames_and_params = (frames, params)
-        return frames_and_params
-
-    def write_defined_frames(self, file_dir_path, frames_and_params, count):
+    @staticmethod
+    def write_defined_frames(file_dir_path, frames_and_params, count):
         """Write frames to file under defined path.
         Params
         ------
@@ -73,6 +40,39 @@ class WaveReader:
         self.sample_width = self.audio_file.getsampwidth()
         self.channels = self.audio_file.getnchannels()
         self.frame_rate = self.audio_file.getframerate()
+
+    @staticmethod
+    def read_defined_frames(file_path, event):
+        """Read events from audio file
+        Params
+        ------
+            file_path: str
+                path to audio file which will be read
+            event: (float, float, float)
+                touple containing start, end and lenth of event
+        Returns
+        -------
+            frames_and_params: (b, ())
+                touple containing frames which event and params of file.
+        """
+        start, end, length = event
+        audio_file = wave.open(file_path, 'rb')
+        audio_file.rewind()
+        frame_rate = audio_file.getframerate()
+        start_position = audio_file.tell() + int(start * frame_rate)
+        audio_file.setpos(start_position)
+        frames_to_read = int(length * frame_rate)
+
+        print('Read frames from {} to {}'.format(start_position, start_position + frames_to_read))
+
+        frames = audio_file.readframes(frames_to_read)
+
+        print('Samples from {} to {} has been read.'.format(start_position, audio_file.tell()))
+        print('')
+
+        params = audio_file.getparams()
+        frames_and_params = (frames, params)
+        return frames_and_params
 
     def read_audio_data_chunk(self, seconds_to_read=30):
         """ Read audio data in chunks.
