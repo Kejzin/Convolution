@@ -6,7 +6,7 @@ from CmdInterface import CmdInterface
 
 class WaveFileSearcher:
     @staticmethod
-    def find_wave_files_paths(self, ):
+    def find_wave_files_paths():
         """
         Find wave files under path given in cmd. Path must be a directory containing wav files and REFERENCE.wav file.
         Returns
