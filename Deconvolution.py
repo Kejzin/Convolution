@@ -16,10 +16,16 @@ def simplest_possible_plot(data_to_plot, plot_name):
     ax.grid()
     plt.savefig(f"plots\\{plot_name}")
 
+
 def normalize_np_array(np_array_to_normalize):
-    norm = np.linalg.norm(np_array_to_normalize)
-    normal_array = np_array_to_normalize / norm
+    try:
+        max_value = max(np_array_to_normalize.min(), np_array_to_normalize.max(), key=abs)
+        normal_array = np_array_to_normalize / max_value
+    except AttributeError:
+        print("empty array or other Atribute Error")
+        normal_array = np.array([0,0])
     return normal_array
+
 
 if __name__ == "__main__":
     # Read signal and impulse response valuse
@@ -45,38 +51,34 @@ if __name__ == "__main__":
 
     # Normalize impulse response data and adjust it's gain. It is extremely overload
     response_gain = 1/1000
-    max_response_data = abs(limited_impulse_response_data).max()
-    response_data_normalized = \
-        [(normalized_data/max_response_data) * response_gain for normalized_data in limited_impulse_response_data]
+    response_data_normalized = normalize_np_array(limited_impulse_response_data)
 
+    simplest_possible_plot(response_data_normalized, "normalized_response_data.png")
     # Process a convolution on signal data using impulse response
-    convolved = signal.convolve(limited_impulse_response_data, limited_signal_data_normalized)
+    convolved = signal.convolve(limited_signal_data_normalized, limited_impulse_response_data,)
 
     max_convolved_data = abs(convolved).max()
     # Normalize convolved data and expand its value to save as wave
     convolved_normalized = normalize_np_array(convolved)
 
-    simplest_possible_plot(convolved_normalized, "convolved_normalized.png")
+    simplest_possible_plot(convolved_normalized, "normalized_convolved.png")
 
-    convolved_to_wave = [data/2 for data in convolved]
-
-    simplest_possible_plot(convolved_to_wave, "convolved_to_wave.png")
-
-    wavfile.write(convolved_signal_file_path, signal_fs, np.array(convolved_to_wave))
+    wavfile.write(convolved_signal_file_path, signal_fs, convolved_normalized)
 
     convolved_fs, read_convolved_data = wavfile.read(convolved_signal_file_path)
 
-    max_convolved_value = abs(read_convolved_data).max()
-    read_convolved_data = [(normalized_data / max_convolved_value) for normalized_data in read_convolved_data]
+    read_convolved_data_normalized = normalize_np_array(read_convolved_data)
 
-    simplest_possible_plot(read_convolved_data, "readed_convolved_data.png")
+    simplest_possible_plot(read_convolved_data_normalized, "normalized_read_convolved_data.png")
 
     recovered, remainder = signal.deconvolve(limited_impulse_response_data, read_convolved_data)
 
-    simplest_possible_plot(recovered, "recovered.png")
-    simplest_possible_plot(remainder, "remainder.png")
+    recovered_normalized = normalize_np_array(recovered)
+    remainder_normalized = normalize_np_array(remainder)
 
-    recovered_deconvolved_to_wave = [data for data in recovered]
-    wavfile.write(recovered_signal_path, signal_fs, np.array(recovered_deconvolved_to_wave))
+    simplest_possible_plot(recovered_normalized, "normalized_recovered.png")
+    simplest_possible_plot(remainder_normalized, "normalized_remainder.png")
+
+    wavfile.write(recovered_signal_path, signal_fs, recovered_normalized)
 
     print("Tadam")
