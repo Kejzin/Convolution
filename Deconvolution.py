@@ -3,13 +3,17 @@ from scipy import signal
 import numpy as np
 import matplotlib.pyplot as plt
 
-signal_wave_file_path = r".\Test_signals\dummy.wav"
+signal_wav_file_path = r".\Test_signals\dummy.wav"
 impulse_response_wav_file_path = r".\Test_signals\RESPONSE.wav"
 convolved_signal_file_path = r".\created_signals\convolved.wav"
 recovered_signal_path = r".\created_signals\deconvolved.wav"
 
 
 def simplest_possible_plot(data_to_plot, plot_name):
+    """Create very simple plot of np.array()given for testing purposes.
+
+     Construct linear x_axis to mach length of given data. Save it in working directory, in "plots/" subfolder
+     """
     x_axis = np.arange(0, len(data_to_plot))
     fig, ax = plt.subplots()
     ax.plot(x_axis, data_to_plot)
@@ -18,59 +22,63 @@ def simplest_possible_plot(data_to_plot, plot_name):
 
 
 def normalize_np_array(np_array_to_normalize):
+    """Normalize numpy array. Return empty array if meets attribute error"""
     try:
         max_value = max(np_array_to_normalize.min(), np_array_to_normalize.max(), key=abs)
         normal_array = np_array_to_normalize / max_value
     except AttributeError:
-        print("empty array or other Atribute Error")
-        normal_array = np.array([0,0])
+        print("empty array or other Attribute Error")
+        normal_array = np.array([0])
     return normal_array
 
 
 if __name__ == "__main__":
-    # Read signal and impulse response valuse
-    signal_fs, signal_data = wavfile.read(signal_wave_file_path)
+    # Read signal and impulse response value
+    signal_fs, signal_data = wavfile.read(signal_wav_file_path)
     response_fs, impulse_response_data = wavfile.read(impulse_response_wav_file_path)
 
-    simplest_possible_plot(signal_data, "signal.png")
-    simplest_possible_plot(impulse_response_data, "response.png")
+    simplest_possible_plot(signal_data, "original_signal.png")
+    simplest_possible_plot(impulse_response_data, "original_response.png")
 
     response_length = len(impulse_response_data)
     signal_length = len(signal_data)
 
+    desired_response_length = list(range(int(response_length/2)))
+    desired_signal_length = list(range(int(signal_length/4)))
 
     # Limit response and signal length to optimize computing time for testing
-    limited_impulse_response_data = impulse_response_data[0:int(response_length/2)]
-    limited_signal_data = signal_data[0:int(signal_length/4)]
+    limited_impulse_response_data = impulse_response_data[0:desired_response_length]
+    limited_signal_data = signal_data[0:desired_signal_length]
 
     simplest_possible_plot(limited_signal_data, "limited_signal.png")
     simplest_possible_plot(limited_impulse_response_data, "limited_response.png")
 
-    # Normalize signal data
+    # Normalize signals data
     limited_signal_data_normalized = normalize_np_array(limited_signal_data)
+    limited_response_data_normalized = normalize_np_array(limited_impulse_response_data)
 
-    # Normalize impulse response data and adjust it's gain. It is extremely overload
-    response_gain = 1/1000
-    response_data_normalized = normalize_np_array(limited_impulse_response_data)
+    simplest_possible_plot(limited_response_data_normalized, "normalized_response_data.png")
 
-    simplest_possible_plot(response_data_normalized, "normalized_response_data.png")
     # Process a convolution on signal data using impulse response
     convolved = signal.convolve(limited_signal_data_normalized, limited_impulse_response_data,)
 
-    max_convolved_data = abs(convolved).max()
-    # Normalize convolved data and expand its value to save as wave
+    # Normalize convolved data
     convolved_normalized = normalize_np_array(convolved)
 
     simplest_possible_plot(convolved_normalized, "normalized_convolved.png")
 
+    # Save normalized convolved data as wav file.
     wavfile.write(convolved_signal_file_path, signal_fs, convolved_normalized)
 
+    # Read convolved data from wav file. It is simulation of real-life usage when we have convoluted signal and
+    # impulse response, not pure input signal.
     convolved_fs, read_convolved_data = wavfile.read(convolved_signal_file_path)
 
     read_convolved_data_normalized = normalize_np_array(read_convolved_data)
 
     simplest_possible_plot(read_convolved_data_normalized, "normalized_read_convolved_data.png")
 
+    # Deconvolve read convolved signal with given impulse response.
     recovered, remainder = signal.deconvolve(limited_impulse_response_data, read_convolved_data)
 
     recovered_normalized = normalize_np_array(recovered)
@@ -79,6 +87,7 @@ if __name__ == "__main__":
     simplest_possible_plot(recovered_normalized, "normalized_recovered.png")
     simplest_possible_plot(remainder_normalized, "normalized_remainder.png")
 
+    # Save recovered signal as wav
     wavfile.write(recovered_signal_path, signal_fs, recovered_normalized)
 
     print("Tadam")
