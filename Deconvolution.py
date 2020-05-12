@@ -43,8 +43,8 @@ if __name__ == "__main__":
     response_length = len(impulse_response_data)
     signal_length = len(signal_data)
 
-    desired_response_length = list(range(int(response_length/2)))
-    desired_signal_length = list(range(int(signal_length/4)))
+    desired_response_length = int(response_length/2)
+    desired_signal_length = int(signal_length/4)
 
     # Limit response and signal length to optimize computing time for testing
     limited_impulse_response_data = impulse_response_data[0:desired_response_length]
