@@ -47,20 +47,21 @@ if __name__ == "__main__":
     desired_signal_length = int(signal_length/4)
 
     # Limit response and signal length to optimize computing time for testing
-    limited_impulse_response_data = impulse_response_data[0:desired_response_length]
-    limited_signal_data = signal_data[0:desired_signal_length]
+    timelimited_impulse_response_data = impulse_response_data[0:desired_response_length]
+    timelimited_signal_data = signal_data[0:desired_signal_length]
 
-    simplest_possible_plot(limited_signal_data, "limited_signal.png")
-    simplest_possible_plot(limited_impulse_response_data, "limited_response.png")
+    simplest_possible_plot(timelimited_signal_data, "timelimited_signal.png")
+    simplest_possible_plot(timelimited_impulse_response_data, "timelimited_response.png")
 
     # Normalize signals data
-    limited_signal_data_normalized = normalize_np_array(limited_signal_data)
-    limited_response_data_normalized = normalize_np_array(limited_impulse_response_data)
+    timelimited_signal_data_normalized = normalize_np_array(timelimited_signal_data)
+    timelimited_response_data_normalized = normalize_np_array(timelimited_impulse_response_data)
 
-    simplest_possible_plot(limited_response_data_normalized, "normalized_response_data.png")
+    simplest_possible_plot(timelimited_response_data_normalized, "timelimited_normalized_response_data.png")
+    simplest_possible_plot(timelimited_signal_data_normalized, "timelimited_normalized_signal_data.png")
 
     # Process a convolution on signal data using impulse response
-    convolved = signal.convolve(limited_signal_data_normalized, limited_impulse_response_data,)
+    convolved = signal.convolve(timelimited_signal_data_normalized, timelimited_impulse_response_data,)
 
     # Normalize convolved data
     convolved_normalized = normalize_np_array(convolved)
@@ -79,7 +80,7 @@ if __name__ == "__main__":
     simplest_possible_plot(read_convolved_data_normalized, "normalized_read_convolved_data.png")
 
     # Deconvolve read convolved signal with given impulse response.
-    recovered, remainder = signal.deconvolve(limited_impulse_response_data, read_convolved_data)
+    recovered, remainder = signal.deconvolve(read_convolved_data_normalized, timelimited_impulse_response_data)
 
     recovered_normalized = normalize_np_array(recovered)
     remainder_normalized = normalize_np_array(remainder)
