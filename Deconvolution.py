@@ -22,7 +22,7 @@ def simplest_possible_plot(data_to_plot, plot_name):
 
 
 def normalize_np_array(np_array_to_normalize):
-    """Normalize numpy array. Return empty array if meets attribute error"""
+    """Normalize numpy array to get a values in range [-1,1]. Return empty array if meets attribute error"""
     try:
         max_value = max(np_array_to_normalize.min(), np_array_to_normalize.max(), key=abs)
         normal_array = np_array_to_normalize / max_value
