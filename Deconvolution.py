@@ -1,12 +1,15 @@
 from scipy.io import wavfile
-from scipy import signal
+from scipy import signal, fft
 import numpy as np
 import matplotlib.pyplot as plt
+import math
 
-signal_wav_file_path = r".\Test_signals\dummy.wav"
+signal_wav_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\Czyste\pielegniarki_byly_cierpliwe_maja.wav"
 impulse_response_wav_file_path = r".\Test_signals\RESPONSE.wav"
-convolved_signal_file_path = r".\created_signals\convolved.wav"
+convolved_signal_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\Poglos_dodany\pielegniarki_byly_cierpliwe_maja_conv.wav"
 recovered_signal_path = r".\created_signals\deconvolved.wav"
+remainder_signal_path = r".\created_signals\remainder.wav"
+
 
 
 def simplest_possible_plot(data_to_plot, plot_name):
@@ -25,10 +28,11 @@ def normalize_np_array(np_array_to_normalize):
     """Normalize numpy array to get a values in range [-1,1]. Return empty array if meets attribute error"""
     try:
         max_value = max(np_array_to_normalize.min(), np_array_to_normalize.max(), key=abs)
-        normal_array = np_array_to_normalize / max_value
+        normal_array = (np_array_to_normalize / max_value)
+
     except AttributeError:
         print("empty array or other Attribute Error")
-        normal_array = np.array([0])
+        normal_array = np.array([0])*1000
     return normal_array
 
 
@@ -43,12 +47,12 @@ if __name__ == "__main__":
     response_length = len(impulse_response_data)
     signal_length = len(signal_data)
 
-    desired_response_length = int(response_length/2)
-    desired_signal_length = int(signal_length/4)
+    desired_response_length = int(4096)*4
+    desired_signal_length = int(4096)*8
 
     # Limit response and signal length to optimize computing time for testing
-    timelimited_impulse_response_data = impulse_response_data[0:desired_response_length]
-    timelimited_signal_data = signal_data[0:desired_signal_length]
+    timelimited_impulse_response_data = impulse_response_data# [0:desired_response_length]
+    timelimited_signal_data = signal_data
 
     simplest_possible_plot(timelimited_signal_data, "timelimited_signal.png")
     simplest_possible_plot(timelimited_impulse_response_data, "timelimited_response.png")
@@ -65,7 +69,6 @@ if __name__ == "__main__":
 
     # Normalize convolved data
     convolved_normalized = normalize_np_array(convolved)
-
     simplest_possible_plot(convolved_normalized, "normalized_convolved.png")
 
     # Save normalized convolved data as wav file.
@@ -76,19 +79,8 @@ if __name__ == "__main__":
     convolved_fs, read_convolved_data = wavfile.read(convolved_signal_file_path)
 
     read_convolved_data_normalized = normalize_np_array(read_convolved_data)
+    timelimited_read_convolved_data_normalized = read_convolved_data_normalized[0:desired_response_length]
+    simplest_possible_plot(timelimited_read_convolved_data_normalized, "normalized_read_convolved_data.png")
 
-    simplest_possible_plot(read_convolved_data_normalized, "normalized_read_convolved_data.png")
-
-    # Deconvolve read convolved signal with given impulse response.
-    recovered, remainder = signal.deconvolve(read_convolved_data_normalized, timelimited_impulse_response_data)
-
-    recovered_normalized = normalize_np_array(recovered)
-    remainder_normalized = normalize_np_array(remainder)
-
-    simplest_possible_plot(recovered_normalized, "normalized_recovered.png")
-    simplest_possible_plot(remainder_normalized, "normalized_remainder.png")
-
-    # Save recovered signal as wav
-    wavfile.write(recovered_signal_path, signal_fs, recovered_normalized)
 
     print("Tadam")
