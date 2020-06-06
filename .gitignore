@@ -132,3 +132,6 @@ dmypy.json
 #helpers/ logs file
 *.png
 created_signals/*.wav
+
+*.wav
+*.*~

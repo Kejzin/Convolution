@@ -4,9 +4,9 @@ import numpy as np
 import matplotlib.pyplot as plt
 import math
 
-signal_wav_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\Czyste\pielegniarki_byly_cierpliwe_maja.wav"
-impulse_response_wav_file_path = r".\Test_signals\RESPONSE.wav"
-convolved_signal_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\Poglos_dodany\pielegniarki_byly_cierpliwe_maja_conv.wav"
+signal_wav_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\Czyste\Klasyka2.wav"
+impulse_response_wav_file_path = r".\Test_signals\Big_Hall_E001_M2S.wav"
+convolved_signal_file_path = r"E:\Kejzin\Documents\PWR\Master_Thesis\Sygnaly testowe\poglos\Klasyka2_conv.wav"
 recovered_signal_path = r".\created_signals\deconvolved.wav"
 remainder_signal_path = r".\created_signals\remainder.wav"
 
